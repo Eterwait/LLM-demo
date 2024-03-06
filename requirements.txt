@@ -4,3 +4,5 @@ datasets
 peft
 trl
 accelerate
+flask
+flask_socketio
