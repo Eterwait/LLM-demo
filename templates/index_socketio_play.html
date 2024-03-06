@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic SVG Update with SocketIO</title>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js"></script>
+</head>
+<body>
+    <div style="text-align:center;">
+        <svg id="dynamic-svg" width="12cm" height="12cm">
+            <!-- Room boundaries -->
+            <rect x="0cm" y="0cm" width="12cm" height="12cm" fill="lightgray" />
+
+            <!-- Fridge -->
+            <rect x="2cm" y="2cm" width="1cm" height="2cm" fill="blue" />
+            <text x="2cm" y="3cm" font-family="Arial" font-size="15" fill="black">Fridge</text>
+        
+            <!-- Bed -->
+            <rect x="8cm" y="4cm" width="3cm" height="4cm" fill="orange" />
+            <text x="8cm" y="5cm" font-family="Arial" font-size="15" fill="black">Bed</text>
+
+            <!-- Table -->
+            <rect x="5cm" y="7cm" width="2cm" height="1cm" fill="brown" />
+            <text x="5cm" y="8cm" font-family="Arial" font-size="15" fill="black">Table</text>
+
+            <!-- Oven -->
+            <rect x="9cm" y="1cm" width="1cm" height="1cm" fill="red" />
+            <text x="9cm" y="2cm" font-family="Arial" font-size="15" fill="black">Oven</text>
+        
+            <!-- Window -->
+            <rect x="1cm" y="8cm" width="1cm" height="1cm" fill="violet" />
+            <text x="1cm" y="9cm" font-family="Arial" font-size="15" fill="black">Window</text>
+        
+            <!-- Door -->
+            <rect x="0cm" y="4cm" width="1cm" height="2cm" fill="green" />
+            <text x="0cm" y="5cm" font-family="Arial" font-size="15" fill="black">Door</text>
+        
+            <!-- Robot -->
+            <circle cx="0cm" cy="0cm" r="0.5cm" fill="gray" />
+        </svg>
+    </div>
+    <div style="text-align:center;">
+      <input type="text" id="textInput" placeholder="Enter command" >
+      <button id="submit">Submit</button>
+    </div>
+    <br>
+    <div  style="text-align:center;">
+        <textarea id="dynamic-bt" disabled = "true" rows="30" cols="100" style="resize:none;overflow:hidden;border:none;outline:none;"></textarea>
+    </div>
+  <script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    
+    $('#submit').click(function () {
+        submit();
+    });
+
+    $('#textInput').keypress(function (e) {
+        if (e.which === 13) {
+            submit();
+        }
+    });
+
+    socket.on('svg_update_play', function (updatedSVG) {
+        $('#dynamic-svg').html(updatedSVG);
+    });
+
+    socket.on('update_bt', function (updatedBT) {
+        $('#dynamic-bt').html(updatedBT);
+    });
+
+    function submit() {
+        socket.emit('update_svg_play');
+    }
+
+    function submit() {
+        var textFieldValue = getTextFieldValue();
+        socket.emit('update_svg', {input: textFieldValue});
+    }
+
+    function getTextFieldValue() {
+        var value = $('#textInput').val();
+        $('#textInput').val('');
+        return value;
+    }
+  </script>
+</body>
+</html>
